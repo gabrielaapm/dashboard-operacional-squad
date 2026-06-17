@@ -1,9 +1,0 @@
-{
-  "name": "dashboard-operacional-squad",
-  "version": "1.0.0",
-  "private": true,
-  "description": "Dashboard operacional do squad AI First Lab (estático + porteiro de senha)",
-  "dependencies": {
-    "@vercel/edge": "^1.1.1"
-  }
-}

@@ -3,7 +3,7 @@
 Painel de **volumetria do squad** (carga por pessoa, status do board, concentração por projeto), gerado a partir do board **Mission Control** no Notion.
 
 ## Status atual
-- **Versão:** estática (tema light), publicada no Vercel.
+- **Versão:** estática (tema light), pronta para deploy na Vercel.
 - **Dados:** snapshot de **16/06/2026** — embutidos no `index.html`.
 - **Em planejamento:** sincronização automática diária com o Notion (pull via API + republicação no Vercel). Antes disso, o board precisa de limpeza (há duplicação do projeto Intranet e cards sem status/responsável).
 
