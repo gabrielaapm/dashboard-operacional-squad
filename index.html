@@ -114,8 +114,8 @@ td.vst{text-align:right}
     </div>
     <div class="meta">
       <div class="lockup">AI First Lab · Powered by Best Results</div>
-      <div style="margin-top:8px">Snapshot: <b>16/06/2026</b></div>
-      <div><b id="m-total">165</b> tasks · 10 pessoas · 14 projetos</div>
+      <div style="margin-top:8px">Snapshot: <b>17/06/2026</b></div>
+      <div><b id="m-total">113</b> tasks · 10 pessoas · 14 projetos</div>
     </div>
   </div>
 
@@ -125,7 +125,7 @@ td.vst{text-align:right}
   <div class="grid2">
     <div class="panel">
       <h3>Distribuição de status</h3>
-      <div class="ph">165 tasks no board</div>
+      <div class="ph">113 tasks no board</div>
       <div class="donutwrap">
         <svg id="donut" width="170" height="170" viewBox="0 0 170 170"></svg>
         <div class="dleg" id="dleg" style="flex:1;min-width:170px"></div>
@@ -143,7 +143,7 @@ td.vst{text-align:right}
   <div class="panel" style="margin-top:14px">
     <div class="ph" style="margin-bottom:16px">carga = fatia que a pessoa ocupa do total de tasks do board &nbsp;·&nbsp; status: <b style="color:var(--gap)">Sobrecarga</b> &gt;25% &nbsp;·&nbsp; <b style="color:var(--wip)">Atenção</b> 15&ndash;25% &nbsp;·&nbsp; <b style="color:var(--done)">Equilibrado</b> &lt;15%</div>
     <div id="vol"></div>
-    <p style="font-size:11.5px;color:var(--hint);margin-top:14px">A Intranet (107 cards) é co-atribuída a Mark e Danilo — por isso a soma das fatias passa de 100%. O subtítulo mostra a frente principal e o nº de frentes de cada pessoa.</p>
+    <p style="font-size:11.5px;color:var(--hint);margin-top:14px">A Intranet (55 cards) é co-atribuída a Mark e Danilo — por isso a soma das fatias passa de 100%. O subtítulo mostra a frente principal e o nº de frentes de cada pessoa.</p>
   </div>
 
   <h2 class="sec">Alertas de gargalo</h2>
@@ -176,7 +176,7 @@ td.vst{text-align:right}
   </div>
 
   <div class="foot">
-    <span>Fonte: Notion · Mission Control (DB 51a9778a) · 165 tasks · gerado em 16/06/2026</span>
+    <span>Fonte: Notion · Mission Control (DB 51a9778a) · 113 tasks · gerado em 17/06/2026</span>
     <span>AI First Lab · Powered by Best Results</span>
   </div>
 </div>
@@ -185,7 +185,7 @@ td.vst{text-align:right}
 const COL={done:'#1B9E76',wip:'#C9871C',todo:'#8C87A6',gap:'#D2453C'};
 
 const proj=[
- {n:'Intranet Salon Line',d:60,w:33,t:14,s:0,pe:2},
+ {n:'Intranet Salon Line',d:31,w:17,t:7,s:0,pe:2},
  {n:'Plataforma de IA Salon Line',d:10,w:4,t:9,s:0,pe:7},
  {n:'Best Clipper',d:2,w:1,t:3,s:0,pe:1},
  {n:'Diagnóstico & Monitoramento IA',d:4,w:1,t:1,s:0,pe:2},
@@ -199,8 +199,8 @@ const proj=[
  {n:'Acesso DataLake & Migração',d:0,w:0,t:1,s:0,pe:2}
 ];
 const pess=[
- {n:'Mark Miranda',d:72,w:35,t:16,s:0,fr:3},
- {n:'Danilo Valadão',d:64,w:35,t:15,s:0,fr:2},
+ {n:'Mark Miranda',d:43,w:19,t:9,s:0,fr:3},
+ {n:'Danilo Valadão',d:35,w:19,t:8,s:0,fr:2},
  {n:'Elzo Souza',d:3,w:7,t:4,s:3,fr:6},
  {n:'Giovani Quatrini',d:4,w:4,t:5,s:3,fr:7},
  {n:'Jonathan Ribeiro',d:1,w:4,t:4,s:0,fr:4},
@@ -216,8 +216,8 @@ pess.forEach(p=>{p.total=p.d+p.w+p.t+p.s;p.pct=p.total?Math.round(100*p.d/p.tota
 proj.forEach(p=>p.pct=p.total?Math.round(100*p.d/p.total):0);
 
 const matrix={
- 'Mark Miranda':{'Intranet Salon Line':107,'Plataforma de IA Salon Line':10,'Diagnóstico & Monitoramento IA':6},
- 'Danilo Valadão':{'Intranet Salon Line':107,'Plataforma de IA Salon Line':7},
+ 'Mark Miranda':{'Intranet Salon Line':55,'Plataforma de IA Salon Line':10,'Diagnóstico & Monitoramento IA':6},
+ 'Danilo Valadão':{'Intranet Salon Line':55,'Plataforma de IA Salon Line':7},
  'Elzo Souza':{'Plataforma de IA Salon Line':7,'Involves × Data Lake':3,'Sem projeto':2,'Políticas Comerciais B2B':2,'Operação Interna':2,'Acesso DataLake & Migração':1},
  'Giovani Quatrini':{'Diagnóstico & Monitoramento IA':6,'Involves × Data Lake':3,'Plataforma de IA Salon Line':2,'Políticas Comerciais B2B':2,'Acesso DataLake & Migração':1,'Integração Base Nielsen':1,'Operação Interna':1},
  'Jonathan Ribeiro':{'Plataforma de IA Salon Line':5,'Operação Interna':2,'Sem projeto':1,'Integração Base Nielsen':1},
@@ -232,10 +232,10 @@ const SHORT={'Intranet Salon Line':'Intranet','Plataforma de IA Salon Line':'Pla
 
 /* KPIs */
 const kpis=[
- {l:'Tasks no board',v:165,d:'10 pessoas · 14 projetos'},
- {l:'Concluído',v:'48%',d:'80 de 165 feitas',c:'var(--done)'},
- {l:'Em andamento',v:46,d:'WIP simultâneo',c:'var(--wip)'},
- {l:'A fazer',v:33,d:'10 iniciar · 23 backlog'},
+ {l:'Tasks no board',v:113,d:'10 pessoas · 14 projetos'},
+ {l:'Concluído',v:'45%',d:'51 de 113 feitas',c:'var(--done)'},
+ {l:'Em andamento',v:30,d:'WIP simultâneo',c:'var(--wip)'},
+ {l:'A fazer',v:26,d:'8 iniciar · 18 backlog'},
  {l:'Bloqueado por QA',v:3,d:'frente CRIS / automações',c:'var(--gap)'},
  {l:'Lacunas de governança',v:'7 / 4',d:'sem dono / sem projeto',c:'var(--pri2)'}
 ];
@@ -243,12 +243,12 @@ document.getElementById('kpis').innerHTML=kpis.map(k=>`<div class="kpi"><div cla
 
 /* Donut */
 (function(){
- const data=[{l:'Feito',v:80,c:COL.done},{l:'Em andamento',v:46,c:COL.wip},{l:'A fazer',v:33,c:COL.todo},{l:'Sem status',v:6,c:COL.gap}];
+ const data=[{l:'Feito',v:51,c:COL.done},{l:'Em andamento',v:30,c:COL.wip},{l:'A fazer',v:26,c:COL.todo},{l:'Sem status',v:6,c:COL.gap}];
  const tot=data.reduce((a,b)=>a+b.v,0),cx=85,cy=85,r=60,C=2*Math.PI*r;
  let off=0,svg='';
  svg+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#ECE9F7" stroke-width="22"/>`;
  data.forEach(d=>{const len=d.v/tot*C;svg+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${d.c}" stroke-width="22" stroke-dasharray="${len} ${C-len}" stroke-dashoffset="${-off}" transform="rotate(-90 ${cx} ${cy})"/>`;off+=len;});
- svg+=`<text x="${cx}" y="${cy-4}" text-anchor="middle" fill="#1C1833" font-size="26" font-weight="700">165</text>`;
+ svg+=`<text x="${cx}" y="${cy-4}" text-anchor="middle" fill="#1C1833" font-size="26" font-weight="700">113</text>`;
  svg+=`<text x="${cx}" y="${cy+16}" text-anchor="middle" fill="#6A6488" font-size="11">tasks</text>`;
  document.getElementById('donut').innerHTML=svg;
  document.getElementById('dleg').innerHTML=data.map(d=>`<div><span class="dot" style="background:${d.c}"></span>${d.l}<span class="dv">${d.v}</span><span class="dp">${Math.round(d.v/tot*100)}%</span></div>`).join('');
@@ -264,11 +264,11 @@ function bars(id,rows,max){
   return `<div class="row"><div class="nm" title="${r.n}">${r.n}</div><div class="track" style="max-width:${Math.max(tot/max*100,3)}%">${track}</div><div class="brk">${brk}</div><div class="tot">${tot}</div></div>`;
  }).join('');
 }
-bars('proj',proj,107);
+bars('proj',proj,55);
 
 /* Volumetria por pessoa */
 (function(){
- const TOTAL=165;
+ const TOTAL=113;
  const fmt=v=>v.toFixed(1).replace('.',',');
  const carga=p=>p.total/TOTAL*100;
  const statusOf=v=>v>25?{k:'Sobrecarga',c:COL.gap}:v>=15?{k:'Atenção',c:COL.wip}:{k:'Equilibrado',c:COL.done};
@@ -277,9 +277,9 @@ bars('proj',proj,107);
  const sobre=real.filter(p=>carga(p)>25).length;
 
  const ks=[
-  {l:'Total de tarefas',v:165,d:'no board'},
+  {l:'Total de tarefas',v:113,d:'no board'},
   {l:'Pessoas ativas',v:ativas,d:'com tarefas atribuídas'},
-  {l:'Carga média',v:fmt(165/ativas),d:'tarefas no board ÷ pessoa'},
+  {l:'Carga média',v:fmt(113/ativas),d:'tarefas no board ÷ pessoa'},
   {l:'Sobrecarregados',v:sobre,d:'acima de 25% do board',c:COL.gap}
  ];
  document.getElementById('volstats').innerHTML=ks.map(k=>`<div class="vol-k"><div class="l">${k.l}</div><div class="v" style="color:${k.c||'var(--txt)'}">${k.v}</div><div class="d">${k.d}</div></div>`).join('');
@@ -308,7 +308,7 @@ bars('proj',proj,107);
 
 /* Alerts */
 const alerts=[
- {ic:'⬢',c:COL.wip,h:'Intranet = 65% do board em 2 pessoas',p:'107 das 165 tasks, só Mark e Danilo, ambos nas 107 cards. 33-35 em andamento simultâneas. Bus factor 2.'},
+ {ic:'⬢',c:COL.wip,h:'Intranet = 49% do board em 2 pessoas',p:'55 das 113 tasks, só Mark e Danilo, ambos nas 55 cards. 17 em andamento simultâneas. Bus factor 2.'},
  {ic:'⇄',c:'#6A5FD0',h:'Fragmentação: Elzo e Giovani Quatrini',p:'Elzo em 6 frentes (18% concluído), Giovani em 7 (25%). Troca de contexto derruba a vazão dos dois.'},
  {ic:'!',c:COL.gap,h:'Frente CRIS travada em QA',p:'3 tasks bloqueadas por QA caem em Elzo (2) e Giovani (2): Políticas B2B + automações de Operação Interna.'},
  {ic:'○',c:'#6E6A87',h:'Darwim quase órfão',p:'6 tasks, 0% feito, metade sem responsável. Merlotti sozinho, tudo em backlog.'},
