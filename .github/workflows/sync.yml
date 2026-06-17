@@ -1,0 +1,42 @@
+name: Sync dashboard (Notion)
+
+# Roda às 10h e 20h de Brasília (= 13h e 23h UTC) e também sob demanda.
+on:
+  schedule:
+    - cron: "0 13 * * *"   # 10:00 BRT
+    - cron: "0 23 * * *"   # 20:00 BRT
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-dashboard
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Sync a partir do Notion
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: python sync.py
+
+      - name: Commit & push se houver mudança
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [ -n "$(git status --porcelain)" ]; then
+            git add -A
+            git commit -m "chore: sync dashboard do Notion [skip ci]"
+            git push
+          else
+            echo "Nenhuma mudança nos dados."
+          fi
