@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard Operacional · Squad AI First Lab</title>
+<style>
+:root{
+  --bg:#F6F5FB; --bg2:#FFFFFF; --card:#FFFFFF; --card2:#F2F0F9; --line:#E6E3F1;
+  --txt:#1C1833; --mut:#6A6488; --hint:#9C96B6;
+  --pri:#6A5FD0; --pri2:#5247B5; --pri-d:#453A9C;
+  --done:#1B9E76; --wip:#C9871C; --todo:#8C87A6; --gap:#D2453C;
+  --track:#ECE9F7; --hover:#F2F0FA;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--txt);font-family:system-ui,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5;padding:28px 22px 60px}
+.wrap{max-width:1180px;margin:0 auto}
+a{color:inherit}
+.top{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:26px;border-bottom:1px solid var(--line);padding-bottom:20px}
+.brand{display:flex;align-items:center;gap:13px}
+.logo{width:44px;height:44px;border-radius:11px;background:#fff;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:#141414;padding:7px}
+.logo svg{width:100%;height:100%;display:block}
+.kpi,.panel,.vol-k{box-shadow:0 1px 3px rgba(28,24,51,.05)}
+.brand h1{font-size:19px;font-weight:600;letter-spacing:-.2px}
+.brand .sub{font-size:12.5px;color:var(--mut);margin-top:2px}
+.lockup{font-size:11px;letter-spacing:1.5px;color:var(--hint);text-transform:uppercase}
+.meta{text-align:right;font-size:12.5px;color:var(--mut)}
+.meta b{color:var(--pri2);font-weight:600}
+h2.sec{font-size:13px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;color:var(--pri2);margin:34px 0 14px;display:flex;align-items:center;gap:9px}
+h2.sec::before{content:"";width:4px;height:15px;background:var(--pri);border-radius:2px;display:inline-block}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:13px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px 17px}
+.kpi .l{font-size:12px;color:var(--mut);display:flex;align-items:center;gap:6px}
+.kpi .v{font-size:30px;font-weight:700;margin-top:7px;line-height:1;letter-spacing:-1px}
+.kpi .d{font-size:11.5px;color:var(--hint);margin-top:6px}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+@media(max-width:820px){.grid2{grid-template-columns:1fr}}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 22px}
+.panel h3{font-size:14px;font-weight:600;margin-bottom:4px}
+.panel .ph{font-size:12px;color:var(--mut);margin-bottom:16px}
+.legend{display:flex;flex-wrap:wrap;gap:15px;font-size:12px;color:var(--mut);margin:2px 0 18px}
+.legend span{display:flex;align-items:center;gap:6px}
+.legend i{width:11px;height:11px;border-radius:3px;display:block}
+.row{display:flex;align-items:center;gap:11px;margin:9px 0}
+.row .nm{width:150px;flex:none;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .track{flex:1;display:flex;height:22px;border-radius:5px;overflow:hidden;background:var(--track);min-width:30px}
+.row .track i{height:100%;transition:width .6s ease}
+.row .tot{width:30px;flex:none;text-align:right;font-size:13px;font-weight:700}
+.row .brk{width:96px;flex:none;text-align:right;font-size:11px;color:var(--hint)}
+.donutwrap{display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.dleg{font-size:12.5px}
+.dleg div{display:flex;align-items:center;gap:9px;margin:9px 0}
+.dleg .dv{font-weight:700;margin-left:auto;font-size:14px}
+.dleg .dp{color:var(--hint);font-size:11.5px;width:42px;text-align:right}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th,td{padding:9px 10px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+th{color:var(--mut);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.4px;cursor:pointer;user-select:none}
+th:hover{color:var(--pri2)}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+tr:hover td{background:var(--hover)}
+.bar-mini{height:6px;border-radius:3px;background:var(--track);overflow:hidden;width:70px;display:inline-block;vertical-align:middle}
+.bar-mini i{display:block;height:100%;background:var(--done)}
+.tag{font-size:11px;padding:2px 9px;border-radius:20px;font-weight:600;display:inline-block}
+.heat{overflow-x:auto}
+.heat table{border-collapse:separate;border-spacing:3px;min-width:760px}
+.heat th{text-align:center;font-size:10.5px;padding:6px 4px;color:var(--mut);writing-mode:vertical-rl;transform:rotate(180deg);height:78px;cursor:default}
+.heat th.rh{writing-mode:horizontal-tb;transform:none;text-align:left;height:auto;vertical-align:bottom}
+.heat td{text-align:center;border:none;border-radius:6px;font-size:12px;font-weight:600;color:#fff;padding:0;height:32px;width:54px}
+.heat td.rl{text-align:left;background:transparent!important;color:var(--txt);font-weight:500;padding-left:2px;width:130px}
+.heat tr:hover td{background-inherit}
+.alerts{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+@media(max-width:820px){.alerts{grid-template-columns:1fr}}
+.alert{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gap);border-radius:0 12px 12px 0;padding:14px 16px}
+.alert h4{font-size:13.5px;font-weight:600;margin-bottom:5px;display:flex;align-items:center;gap:8px}
+.alert p{font-size:12.5px;color:var(--mut)}
+.alert .ic{width:22px;height:22px;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex:none}
+.foot{margin-top:42px;padding-top:18px;border-top:1px solid var(--line);font-size:11.5px;color:var(--hint);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+/* Volumetria por pessoa */
+.volstats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:13px}
+.vol-k{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.vol-k .l{font-size:12px;color:var(--mut)}
+.vol-k .v{font-size:27px;font-weight:700;margin-top:6px;line-height:1;letter-spacing:-.5px}
+.vol-k .d{font-size:11px;color:var(--hint);margin-top:5px}
+table.vol{width:100%;border-collapse:collapse;font-size:13px}
+table.vol th{color:var(--mut);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.4px;text-align:left;padding:0 12px 13px}
+table.vol thead tr{border-bottom:1px solid var(--line)}
+table.vol td{padding:13px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+table.vol tbody tr:last-child td{border-bottom:none}
+table.vol tbody tr:hover td{background:var(--hover)}
+.who{display:flex;align-items:center;gap:12px;min-width:190px}
+.av{width:37px;height:37px;border-radius:10px;flex:none;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;color:#fff;letter-spacing:-.3px}
+.who .nm2{font-weight:600;font-size:13.5px;white-space:nowrap}
+.who .rl2{font-size:11.5px;color:var(--hint);margin-top:2px;white-space:nowrap}
+.load{display:flex;align-items:center;gap:11px;min-width:160px}
+.load .lt{flex:1;height:10px;border-radius:5px;background:var(--track);overflow:hidden;min-width:70px}
+.load .lt i{display:block;height:100%;border-radius:5px;transition:width .6s ease}
+.load .lv{font-size:12.5px;font-weight:600;width:46px;text-align:right;color:var(--mut);font-variant-numeric:tabular-nums}
+td.vtot{font-weight:700;font-size:16px;text-align:right;font-variant-numeric:tabular-nums}
+td.vst{text-align:right}
+@media(max-width:680px){.who .rl2{white-space:normal}table.vol{font-size:12px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <div class="brand">
+      <div class="logo"><svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-label="Logo"><g fill="currentColor"><rect x="34" y="10" width="14" height="24" rx="1"/><rect x="72" y="10" width="14" height="24" rx="1"/><rect x="34" y="86" width="14" height="24" rx="1"/><rect x="72" y="86" width="14" height="24" rx="1"/><rect x="18" y="34" width="84" height="13"/><rect x="18" y="73" width="84" height="13"/><rect x="34" y="34" width="14" height="52"/><rect x="72" y="34" width="14" height="52"/><rect x="18" y="47" width="16" height="26"/><rect x="86" y="47" width="16" height="26"/><polygon points="18,40 8,60 18,80"/><polygon points="102,40 112,60 102,80"/><rect x="48" y="53" width="24" height="14"/></g><g fill="#fff"><polygon points="18,48 18,72 31,60"/><polygon points="34,48 34,72 21,60"/><polygon points="102,48 102,72 89,60"/><polygon points="86,48 86,72 99,60"/></g></svg></div>
+      <div>
+        <h1>Dashboard Operacional do Squad</h1>
+        <div class="sub">AI First Lab · Mission Control (Notion)</div>
+      </div>
+    </div>
+    <div class="meta">
+      <div class="lockup">AI First Lab · Powered by Best Results</div>
+      <div style="margin-top:8px">Snapshot: <b>16/06/2026</b></div>
+      <div><b id="m-total">165</b> tasks · 10 pessoas · 14 projetos</div>
+    </div>
+  </div>
+
+  <div class="kpis" id="kpis"></div>
+
+  <h2 class="sec">Status do board e concentração por projeto</h2>
+  <div class="grid2">
+    <div class="panel">
+      <h3>Distribuição de status</h3>
+      <div class="ph">165 tasks no board</div>
+      <div class="donutwrap">
+        <svg id="donut" width="170" height="170" viewBox="0 0 170 170"></svg>
+        <div class="dleg" id="dleg" style="flex:1;min-width:170px"></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>Esforço por projeto</h3>
+      <div class="ph">barra proporcional ao total de tasks</div>
+      <div id="proj"></div>
+    </div>
+  </div>
+
+  <h2 class="sec">Volumetria por pessoa</h2>
+  <div class="volstats" id="volstats"></div>
+  <div class="panel" style="margin-top:14px">
+    <div class="ph" style="margin-bottom:16px">carga = fatia que a pessoa ocupa do total de tasks do board &nbsp;·&nbsp; status: <b style="color:var(--gap)">Sobrecarga</b> &gt;25% &nbsp;·&nbsp; <b style="color:var(--wip)">Atenção</b> 15&ndash;25% &nbsp;·&nbsp; <b style="color:var(--done)">Equilibrado</b> &lt;15%</div>
+    <div id="vol"></div>
+    <p style="font-size:11.5px;color:var(--hint);margin-top:14px">A Intranet (107 cards) é co-atribuída a Mark e Danilo — por isso a soma das fatias passa de 100%. O subtítulo mostra a frente principal e o nº de frentes de cada pessoa.</p>
+  </div>
+
+  <h2 class="sec">Alertas de gargalo</h2>
+  <div class="alerts" id="alerts"></div>
+
+  <h2 class="sec">Detalhamento por pessoa</h2>
+  <div class="panel">
+    <table id="tpess"><thead><tr>
+      <th data-k="n" data-t="s">Pessoa</th>
+      <th class="num" data-k="total">Total</th>
+      <th class="num" data-k="d">Feito</th>
+      <th class="num" data-k="w">Andam.</th>
+      <th class="num" data-k="t">A fazer</th>
+      <th class="num" data-k="pct">% concl.</th>
+      <th class="num" data-k="fr">Frentes</th>
+    </tr></thead><tbody></tbody></table>
+  </div>
+
+  <h2 class="sec">Detalhamento por projeto</h2>
+  <div class="panel">
+    <table id="tproj"><thead><tr>
+      <th data-k="n" data-t="s">Projeto</th>
+      <th class="num" data-k="total">Total</th>
+      <th class="num" data-k="d">Feito</th>
+      <th class="num" data-k="w">Andam.</th>
+      <th class="num" data-k="t">A fazer</th>
+      <th class="num" data-k="pct">% concl.</th>
+      <th class="num" data-k="pe">Pessoas</th>
+    </tr></thead><tbody></tbody></table>
+  </div>
+
+  <div class="foot">
+    <span>Fonte: Notion · Mission Control (DB 51a9778a) · 165 tasks · gerado em 16/06/2026</span>
+    <span>AI First Lab · Powered by Best Results</span>
+  </div>
+</div>
+
+<script>
+const COL={done:'#1B9E76',wip:'#C9871C',todo:'#8C87A6',gap:'#D2453C'};
+
+const proj=[
+ {n:'Intranet Salon Line',d:60,w:33,t:14,s:0,pe:2},
+ {n:'Plataforma de IA Salon Line',d:10,w:4,t:9,s:0,pe:7},
+ {n:'Best Clipper',d:2,w:1,t:3,s:0,pe:1},
+ {n:'Diagnóstico & Monitoramento IA',d:4,w:1,t:1,s:0,pe:2},
+ {n:'Darwim',d:0,w:0,t:4,s:2,pe:1},
+ {n:'Operação Interna',d:3,w:2,t:0,s:0,pe:6},
+ {n:'Sem projeto',d:1,w:2,t:0,s:1,pe:2},
+ {n:'Involves × Data Lake',d:0,w:0,t:1,s:2,pe:2},
+ {n:'Políticas Comerciais B2B',d:0,w:1,t:0,s:1,pe:2},
+ {n:'Integração Base Nielsen',d:0,w:1,t:0,s:0,pe:2},
+ {n:'E-commerce',d:0,w:1,t:0,s:0,pe:0},
+ {n:'Acesso DataLake & Migração',d:0,w:0,t:1,s:0,pe:2}
+];
+const pess=[
+ {n:'Mark Miranda',d:72,w:35,t:16,s:0,fr:3},
+ {n:'Danilo Valadão',d:64,w:35,t:15,s:0,fr:2},
+ {n:'Elzo Souza',d:3,w:7,t:4,s:3,fr:6},
+ {n:'Giovani Quatrini',d:4,w:4,t:5,s:3,fr:7},
+ {n:'Jonathan Ribeiro',d:1,w:4,t:4,s:0,fr:4},
+ {n:'Dino Reis',d:2,w:1,t:3,s:0,fr:1},
+ {n:'Giovanni Merlotti',d:0,w:0,t:3,s:0,fr:1},
+ {n:'Fabio Maximo',d:2,w:0,t:1,s:0,fr:2},
+ {n:'Carla Gabriela',d:1,w:1,t:0,s:0,fr:2},
+ {n:'Mariana Lago',d:1,w:0,t:0,s:0,fr:1},
+ {n:'Sem responsável',d:1,w:1,t:2,s:3,fr:4}
+];
+proj.forEach(p=>p.total=p.d+p.w+p.t+p.s);
+pess.forEach(p=>{p.total=p.d+p.w+p.t+p.s;p.pct=p.total?Math.round(100*p.d/p.total):0});
+proj.forEach(p=>p.pct=p.total?Math.round(100*p.d/p.total):0);
+
+const matrix={
+ 'Mark Miranda':{'Intranet Salon Line':107,'Plataforma de IA Salon Line':10,'Diagnóstico & Monitoramento IA':6},
+ 'Danilo Valadão':{'Intranet Salon Line':107,'Plataforma de IA Salon Line':7},
+ 'Elzo Souza':{'Plataforma de IA Salon Line':7,'Involves × Data Lake':3,'Sem projeto':2,'Políticas Comerciais B2B':2,'Operação Interna':2,'Acesso DataLake & Migração':1},
+ 'Giovani Quatrini':{'Diagnóstico & Monitoramento IA':6,'Involves × Data Lake':3,'Plataforma de IA Salon Line':2,'Políticas Comerciais B2B':2,'Acesso DataLake & Migração':1,'Integração Base Nielsen':1,'Operação Interna':1},
+ 'Jonathan Ribeiro':{'Plataforma de IA Salon Line':5,'Operação Interna':2,'Sem projeto':1,'Integração Base Nielsen':1},
+ 'Dino Reis':{'Best Clipper':6},
+ 'Giovanni Merlotti':{'Darwim':3},
+ 'Fabio Maximo':{'Operação Interna':2,'Plataforma de IA Salon Line':1},
+ 'Carla Gabriela':{'Plataforma de IA Salon Line':1,'Operação Interna':1},
+ 'Mariana Lago':{'Operação Interna':1},
+ 'Sem responsável':{'Darwim':3,'Sem projeto':2,'E-commerce':1,'Plataforma de IA Salon Line':1}
+};
+const SHORT={'Intranet Salon Line':'Intranet','Plataforma de IA Salon Line':'Plataforma IA','Diagnóstico & Monitoramento IA':'Diagnóstico IA','Best Clipper':'Best Clipper','Darwim':'Darwim','Operação Interna':'Operação','Sem projeto':'Sem proj.','Involves × Data Lake':'Involves','Políticas Comerciais B2B':'B2B','Integração Base Nielsen':'Nielsen','E-commerce':'E-comm','Acesso DataLake & Migração':'Acesso DL'};
+
+/* KPIs */
+const kpis=[
+ {l:'Tasks no board',v:165,d:'10 pessoas · 14 projetos'},
+ {l:'Concluído',v:'48%',d:'80 de 165 feitas',c:'var(--done)'},
+ {l:'Em andamento',v:46,d:'WIP simultâneo',c:'var(--wip)'},
+ {l:'A fazer',v:33,d:'10 iniciar · 23 backlog'},
+ {l:'Bloqueado por QA',v:3,d:'frente CRIS / automações',c:'var(--gap)'},
+ {l:'Lacunas de governança',v:'7 / 4',d:'sem dono / sem projeto',c:'var(--pri2)'}
+];
+document.getElementById('kpis').innerHTML=kpis.map(k=>`<div class="kpi"><div class="l">${k.l}</div><div class="v" style="color:${k.c||'var(--txt)'}">${k.v}</div><div class="d">${k.d}</div></div>`).join('');
+
+/* Donut */
+(function(){
+ const data=[{l:'Feito',v:80,c:COL.done},{l:'Em andamento',v:46,c:COL.wip},{l:'A fazer',v:33,c:COL.todo},{l:'Sem status',v:6,c:COL.gap}];
+ const tot=data.reduce((a,b)=>a+b.v,0),cx=85,cy=85,r=60,C=2*Math.PI*r;
+ let off=0,svg='';
+ svg+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#ECE9F7" stroke-width="22"/>`;
+ data.forEach(d=>{const len=d.v/tot*C;svg+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${d.c}" stroke-width="22" stroke-dasharray="${len} ${C-len}" stroke-dashoffset="${-off}" transform="rotate(-90 ${cx} ${cy})"/>`;off+=len;});
+ svg+=`<text x="${cx}" y="${cy-4}" text-anchor="middle" fill="#1C1833" font-size="26" font-weight="700">165</text>`;
+ svg+=`<text x="${cx}" y="${cy+16}" text-anchor="middle" fill="#6A6488" font-size="11">tasks</text>`;
+ document.getElementById('donut').innerHTML=svg;
+ document.getElementById('dleg').innerHTML=data.map(d=>`<div><span class="dot" style="background:${d.c}"></span>${d.l}<span class="dv">${d.v}</span><span class="dp">${Math.round(d.v/tot*100)}%</span></div>`).join('');
+})();
+
+/* Bars */
+function bars(id,rows,max){
+ document.getElementById(id).innerHTML=rows.map(r=>{
+  const tot=r.d+r.w+r.t+r.s;
+  const seg=(n,c)=>n?`<i style="width:${n/tot*100}%;background:${c}"></i>`:'';
+  const track=seg(r.d,COL.done)+seg(r.w,COL.wip)+seg(r.t,COL.todo)+seg(r.s,COL.gap);
+  const brk=[r.d?r.d+' f':'',r.w?r.w+' a':'',r.t?r.t+' p':'',r.s?r.s+' ?':''].filter(Boolean).join(' · ');
+  return `<div class="row"><div class="nm" title="${r.n}">${r.n}</div><div class="track" style="max-width:${Math.max(tot/max*100,3)}%">${track}</div><div class="brk">${brk}</div><div class="tot">${tot}</div></div>`;
+ }).join('');
+}
+bars('proj',proj,107);
+
+/* Volumetria por pessoa */
+(function(){
+ const TOTAL=165;
+ const fmt=v=>v.toFixed(1).replace('.',',');
+ const carga=p=>p.total/TOTAL*100;
+ const statusOf=v=>v>25?{k:'Sobrecarga',c:COL.gap}:v>=15?{k:'Atenção',c:COL.wip}:{k:'Equilibrado',c:COL.done};
+ const real=pess.filter(p=>p.n!=='Sem responsável');
+ const ativas=real.filter(p=>p.total>0).length;
+ const sobre=real.filter(p=>carga(p)>25).length;
+
+ const ks=[
+  {l:'Total de tarefas',v:165,d:'no board'},
+  {l:'Pessoas ativas',v:ativas,d:'com tarefas atribuídas'},
+  {l:'Carga média',v:fmt(165/ativas),d:'tarefas no board ÷ pessoa'},
+  {l:'Sobrecarregados',v:sobre,d:'acima de 25% do board',c:COL.gap}
+ ];
+ document.getElementById('volstats').innerHTML=ks.map(k=>`<div class="vol-k"><div class="l">${k.l}</div><div class="v" style="color:${k.c||'var(--txt)'}">${k.v}</div><div class="d">${k.d}</div></div>`).join('');
+
+ const PAL=['#6A5FD0','#1B9E76','#3F86C9','#C9871C','#9B6BD0','#3FA890','#C9669A','#5B86C0','#B07F2E','#7D6FD8'];
+ const initials=n=>{const w=n.trim().split(/\s+/);return ((w[0][0]||'')+(w[1]?w[1][0]:'')).toUpperCase();};
+ const domProj=n=>{const m=matrix[n]||{};let b='',bv=-1;for(const k in m)if(m[k]>bv){bv=m[k];b=k;}return b?(SHORT[b]||b):'—';};
+ const brk=n=>{const m=matrix[n]||{};return Object.entries(m).sort((a,b)=>b[1]-a[1]).map(([k,v])=>(SHORT[k]||k)+' '+v).join(' · ');};
+
+ const rows=pess.slice().sort((a,b)=>b.total-a.total);
+ const body=rows.map((p,i)=>{
+   const isNo=p.n==='Sem responsável';
+   const v=carga(p),st=statusOf(v);
+   const av=isNo?`<div class="av" style="background:var(--track);color:var(--mut)">?</div>`:`<div class="av" style="background:${PAL[i%PAL.length]}">${initials(p.n)}</div>`;
+   const sub=isNo?('sem dono · '+p.fr+' frentes'):(domProj(p.n)+' · '+p.fr+(p.fr>1?' frentes':' frente'));
+   return `<tr${isNo?' style="opacity:.7"':''} title="${p.n}: ${brk(p.n)||'—'}">`+
+     `<td><div class="who">${av}<div><div class="nm2">${p.n}</div><div class="rl2">${sub}</div></div></div></td>`+
+     `<td><div class="load"><div class="lt"><i style="width:${Math.max(v,2)}%;background:${st.c}"></i></div><div class="lv">${fmt(v)}%</div></div></td>`+
+     `<td class="vtot">${p.total}</td>`+
+     `<td class="vst"><span class="tag" style="background:${st.c}22;color:${st.c}">${st.k}</span></td>`+
+   `</tr>`;
+ }).join('');
+
+ document.getElementById('vol').innerHTML=`<table class="vol"><thead><tr><th>Pessoa</th><th>Carga de trabalho</th><th style="text-align:right">Tarefas</th><th style="text-align:right">Status</th></tr></thead><tbody>${body}</tbody></table>`;
+})();
+
+/* Alerts */
+const alerts=[
+ {ic:'⬢',c:COL.wip,h:'Intranet = 65% do board em 2 pessoas',p:'107 das 165 tasks, só Mark e Danilo, ambos nas 107 cards. 33-35 em andamento simultâneas. Bus factor 2.'},
+ {ic:'⇄',c:'#6A5FD0',h:'Fragmentação: Elzo e Giovani Quatrini',p:'Elzo em 6 frentes (18% concluído), Giovani em 7 (25%). Troca de contexto derruba a vazão dos dois.'},
+ {ic:'!',c:COL.gap,h:'Frente CRIS travada em QA',p:'3 tasks bloqueadas por QA caem em Elzo (2) e Giovani (2): Políticas B2B + automações de Operação Interna.'},
+ {ic:'○',c:'#6E6A87',h:'Darwim quase órfão',p:'6 tasks, 0% feito, metade sem responsável. Merlotti sozinho, tudo em backlog.'},
+ {ic:'▤',c:'#6E6A87',h:'Higiene do board',p:'7 sem dono, 4 sem projeto, 6 sem status, 27 sem prioridade. Cega o planejamento de sprint.'},
+ {ic:'↓',c:COL.gap,h:'Vazão baixa na plataforma',p:'Jonathan com 11% concluído (1 de 9). Plataforma IA em 43%, com 9 tasks ainda a iniciar.'}
+];
+document.getElementById('alerts').innerHTML=alerts.map(a=>`<div class="alert" style="border-left-color:${a.c}"><h4><span class="ic" style="background:${a.c}22;color:${a.c}">${a.ic}</span>${a.h}</h4><p>${a.p}</p></div>`).join('');
+
+/* Tables (sortable) */
+function pctTag(v){const c=v>=60?COL.done:v>=30?COL.wip:COL.gap;return `<span class="tag" style="background:${c}22;color:${c}">${v}%</span>`;}
+function miniBar(v){return `<span class="bar-mini"><i style="width:${v}%"></i></span> ${v}%`;}
+function renderTable(id,data,cols){
+ const tb=document.querySelector('#'+id+' tbody');
+ tb.innerHTML=data.map(r=>'<tr>'+cols.map(c=>{
+   let v=r[c.k];
+   if(c.k==='pct')v=pctTag(r.pct);
+   return `<td class="${c.num?'num':''}">${v}</td>`;
+ }).join('')+'</tr>').join('');
+}
+const pcols=[{k:'n'},{k:'total',num:1},{k:'d',num:1},{k:'w',num:1},{k:'t',num:1},{k:'pct',num:1},{k:'fr',num:1}];
+const prcols=[{k:'n'},{k:'total',num:1},{k:'d',num:1},{k:'w',num:1},{k:'t',num:1},{k:'pct',num:1},{k:'pe',num:1}];
+let pSort={k:'total',dir:-1}, prSort={k:'total',dir:-1};
+function sortData(d,s){return d.slice().sort((a,b)=>{let x=a[s.k],y=b[s.k];if(typeof x==='string')return s.dir*x.localeCompare(y);return s.dir*(x-y);});}
+function refresh(){renderTable('tpess',sortData(pess,pSort),pcols);renderTable('tproj',sortData(proj,prSort),prcols);}
+refresh();
+document.querySelectorAll('#tpess th').forEach(th=>th.onclick=()=>{const k=th.dataset.k;pSort.dir=(pSort.k===k)?-pSort.dir:(th.dataset.t==='s'?1:-1);pSort.k=k;refresh();});
+document.querySelectorAll('#tproj th').forEach(th=>th.onclick=()=>{const k=th.dataset.k;prSort.dir=(prSort.k===k)?-prSort.dir:(th.dataset.t==='s'?1:-1);prSort.k=k;refresh();});
+</script>
+</body>
+</html>
