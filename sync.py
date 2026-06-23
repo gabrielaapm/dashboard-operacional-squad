@@ -26,7 +26,7 @@ API = "https://api.notion.com/v1"
 # Boards de tarefas a agregar. Em todos, status="Status" e projeto="Projeto";
 # só o nome do título e do responsável muda entre boards.
 BOARDS = [
-    {"name": "Mission Control", "db": "51a9778a71e14d089e69861633ed78aa", "title": "Task",   "people": "Nome"},
+    {"name": "Mission Control", "db": "51a9778a71e14d089e69861633ed78aa", "title": "Task",   "people": "Responsável"},
     {"name": "PO&PM",           "db": "5a82da1e86074878937460102cc5cd11", "title": "Tarefa", "people": "Responsável"},
 ]
 
