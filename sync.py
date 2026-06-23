@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
-Sync Mission Control (Notion) -> dashboard (index.html).
+Sync (Notion) -> dashboard (index.html).
 
-Roda no GitHub Actions (10h e 20h BRT). Lê o board, recalcula a volumetria
-e reescreve o bloco `const DATA = {...}` dentro do index.html, entre os
-marcadores /*DATA:START*/ e /*DATA:END*/.
+Lê os boards de tarefas no Notion, junta tudo (deduplicando tarefas
+repetidas entre boards pelo título) e reescreve o bloco `const DATA = {...}`
+do index.html, entre os marcadores /*DATA:START*/ e /*DATA:END*/.
 
-Sem dependências externas (usa só a stdlib).
+Roda no GitHub Actions às 8h, 12h, 16h e 20h (BRT). Só usa a stdlib.
 """
 import os
 import re
@@ -20,14 +20,20 @@ TOKEN = os.environ.get("NOTION_TOKEN")
 if not TOKEN:
     sys.exit("ERRO: variável de ambiente NOTION_TOKEN não definida.")
 
-DATABASE_ID = "51a9778a71e14d089e69861633ed78aa"   # Mission Control
 NOTION_VERSION = "2022-06-28"
 API = "https://api.notion.com/v1"
 
-# Status do Notion -> bucket do dashboard
+# Boards de tarefas a agregar. Em todos, status="Status" e projeto="Projeto";
+# só o nome do título e do responsável muda entre boards.
+BOARDS = [
+    {"name": "Mission Control", "db": "51a9778a71e14d089e69861633ed78aa", "title": "Task",   "people": "Nome"},
+    {"name": "PO&PM",           "db": "5a82da1e86074878937460102cc5cd11", "title": "Tarefa", "people": "Responsável"},
+]
+
+# Status (de qualquer board) -> bucket do dashboard
 DONE = {"Feito"}
-WIP = {"Em progresso", "Em revisão", "Bloqueado por QA"}
-TODO = {"Iniciar", "Backlog"}
+WIP = {"Em progresso", "Em revisão", "Bloqueado por QA", "Em andamento"}
+TODO = {"Iniciar", "Backlog", "A fazer"}
 
 
 def api_post(path, body):
@@ -45,25 +51,26 @@ def api_post(path, body):
         with urllib.request.urlopen(req) as r:
             return json.load(r)
     except urllib.error.HTTPError as e:
-        sys.exit(f"ERRO HTTP {e.code} do Notion: {e.read().decode('utf-8', 'ignore')}")
+        raise RuntimeError(f"HTTP {e.code}: {e.read().decode('utf-8', 'ignore')}")
 
 
-def fetch_all():
+def fetch_board(db_id):
     pages, cursor = [], None
     while True:
         body = {"page_size": 100}
         if cursor:
             body["start_cursor"] = cursor
-        data = api_post(f"/databases/{DATABASE_ID}/query", body)
-        pages.extend(data.get("results", []))
+        data = api_post(f"/databases/{db_id}/query", body)
+        pages.extend(pg for pg in data.get("results", [])
+                     if not pg.get("archived") and not pg.get("in_trash"))
         if not data.get("has_more"):
             break
         cursor = data.get("next_cursor")
     return pages
 
 
-def p_title(pr):
-    return "".join(x.get("plain_text", "") for x in pr.get("Task", {}).get("title", [])).strip()
+def p_title(pr, field):
+    return "".join(x.get("plain_text", "") for x in pr.get(field, {}).get("title", [])).strip()
 
 
 def p_status(pr):
@@ -76,8 +83,8 @@ def p_select(pr, name):
     return s["name"] if s else None
 
 
-def p_people(pr):
-    return [u.get("name") or "Sem nome" for u in pr.get("Nome", {}).get("people", [])]
+def p_people(pr, field):
+    return [u.get("name") or "Sem nome" for u in pr.get(field, {}).get("people", [])]
 
 
 def bucket(status):
@@ -91,19 +98,39 @@ def bucket(status):
 
 
 def main():
-    pages = [pg for pg in fetch_all() if not pg.get("archived") and not pg.get("in_trash")]
-    if not pages:
-        sys.exit("ERRO: 0 páginas retornadas. A integração 'dash-notion' está "
-                 "conectada ao board Mission Control? (board -> ⋯ -> Conexões)")
+    raw = []
+    for b in BOARDS:
+        try:
+            pages = fetch_board(b["db"])
+        except RuntimeError as e:
+            print(f"AVISO: board '{b['name']}' indisponível ({e}). Pulando — "
+                  f"a integração dash-notion está conectada a ele? (board -> ⋯ -> Conexões)")
+            continue
+        print(f"  {b['name']}: {len(pages)} cards")
+        for pg in pages:
+            pr = pg["properties"]
+            raw.append({
+                "title": p_title(pr, b["title"]),
+                "status": p_status(pr),
+                "projeto": p_select(pr, "Projeto") or "Sem projeto",
+                "people": p_people(pr, b["people"]) or ["Sem responsável"],
+            })
 
-    rows = []
-    for pg in pages:
-        pr = pg["properties"]
-        rows.append({
-            "status": p_status(pr),
-            "projeto": p_select(pr, "Projeto") or "Sem projeto",
-            "people": p_people(pr) or ["Sem responsável"],
-        })
+    if not raw:
+        sys.exit("ERRO: 0 tarefas em todos os boards. A integração dash-notion "
+                 "está conectada aos boards? (board -> ⋯ -> Conexões)")
+
+    # Dedup por título: mesma tarefa repetida entre boards conta 1x.
+    # Mantém a 1ª ocorrência (ordem dos BOARDS). Cards sem título não deduplicam.
+    seen, rows, dups = set(), [], 0
+    for r in raw:
+        key = r["title"].strip().lower()
+        if key and key in seen:
+            dups += 1
+            continue
+        if key:
+            seen.add(key)
+        rows.append(r)
 
     total = len(rows)
     g = {"d": 0, "w": 0, "t": 0, "s": 0}
@@ -137,7 +164,7 @@ def main():
 
     done, wip, todo, nost = g["d"], g["w"], g["t"], g["s"]
     pct = round(100 * done / total) if total else 0
-    iniciar = sum(1 for r in rows if r["status"] == "Iniciar")
+    iniciar = sum(1 for r in rows if r["status"] in ("Iniciar", "A fazer"))
     backlog = sum(1 for r in rows if r["status"] == "Backlog")
     blocked = sum(1 for r in rows if r["status"] == "Bloqueado por QA")
     sem_dono = sum(1 for r in rows if r["people"] == ["Sem responsável"])
@@ -200,7 +227,8 @@ def main():
         sys.exit("ERRO: marcadores /*DATA:START*/ … /*DATA:END*/ não encontrados no index.html.")
     with open("index.html", "w", encoding="utf-8") as f:
         f.write(new)
-    print(f"OK: {total} tasks · {len(proj)} projetos · {len(pess)} pessoas · {pct}% concluído.")
+    print(f"OK: {total} tasks ({dups} duplicatas removidas) · {len(proj)} projetos · "
+          f"{len(pess)} pessoas · {pct}% concluído.")
 
 
 if __name__ == "__main__":

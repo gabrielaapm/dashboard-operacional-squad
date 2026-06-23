@@ -1,9 +1,11 @@
 name: Sync dashboard (Notion)
 
-# Roda às 10h e 20h de Brasília (= 13h e 23h UTC) e também sob demanda.
+# Roda às 8h, 12h, 16h e 20h de Brasília (= 11/15/19/23h UTC) e também sob demanda.
 on:
   schedule:
-    - cron: "0 13 * * *"   # 10:00 BRT
+    - cron: "0 11 * * *"   # 08:00 BRT
+    - cron: "0 15 * * *"   # 12:00 BRT
+    - cron: "0 19 * * *"   # 16:00 BRT
     - cron: "0 23 * * *"   # 20:00 BRT
   workflow_dispatch: {}
 
